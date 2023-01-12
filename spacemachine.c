@@ -20,6 +20,7 @@ void noOperation(void)
     return;
 }
 
+/*Pushes the value on the next cell onto the stack. */
 void push(void)
 {
     programCounter++;
@@ -33,7 +34,7 @@ void halt(void)
 {
     free(stackArray);
     free(returnArray);
-    exit;
+    exit(0);
 }
 
 void decode(void)
@@ -58,7 +59,6 @@ int main(int argc, char **argv)
 	printf("ERROR: Unable to allocate returnArray!\n");
 	return 1;
     }
-
     
     while(programCounter < 100){
 	decode();
