@@ -5,18 +5,20 @@
 
 #define INT uint16_t
 
-INT programRam[100]; /* Temporary for testing. The finished program will load the prpogram from a file. */
+INT programRam[65536];
 INT *stackArray;
 INT stackSize = 100;
 INT *returnArray;
 INT returnSize = 25;
 INT programCounter = 0;
 INT stackPointer = 0;
+INT framePointer = 0;
 INT returnPointer = 0;
 
 /*Does nothing and does it well. */
 void noOperation(void)
 {
+    programCounter++;
     return;
 }
 
@@ -26,6 +28,7 @@ void push(void)
     programCounter++;
     stackArray[stackPointer] = programRam[programCounter];
     stackPointer++;
+    programCounter++;
     return;
 }
     
@@ -39,7 +42,7 @@ void halt(void)
 
 void decode(void)
 {
-    /*using a jumptable because some compilers aren't too eager to optimize switch-case loops to jumptablesI'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
+    /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
     void (*jumptable[3])(void) = {noOperation, push, halt};
   
     jumptable[programRam[programCounter]]();
@@ -60,9 +63,8 @@ int main(int argc, char **argv)
 	return 1;
     }
     
-    while(programCounter < 100){
+    while(programCounter < 65535){
 	decode();
-	programCounter++;
     }
   
     free(stackArray);
