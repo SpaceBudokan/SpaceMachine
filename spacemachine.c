@@ -31,7 +31,42 @@ void push(void)
     programCounter++;
     return;
 }
-    
+
+/* "Drops" top of stack */
+void pop(void)
+{
+    stackPointer--;
+    programCounter++;
+    return;
+}
+
+/* Sets the frame pointer for local variable use. Not required to call a subroutine. */
+void newFrame(void)
+{
+    stackArray[stackPointer] = framePointer;
+    framePointer = stackPointer;
+    stackPointer++;
+    programCounter++;
+    return;
+}
+
+void jumpToSubroutine(void)
+{   
+    returnArray[returnPointer] = programCounter + 1;
+    returnPointer++;
+    stackPointer--;
+    programCounter = stackArray[stackPointer];
+    return;
+}
+
+void outputChar(void)
+{
+    stackPointer--;
+    putchar((char)stackArray[stackPointer]);
+    programCounter++;
+    return;
+}
+
 /*Stops the whole thing and exits back to the operating system. */
 void halt(void)
 {
@@ -43,7 +78,9 @@ void halt(void)
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
-    void (*jumptable[3])(void) = {noOperation, push, halt};
+    void (*jumptable[7])(void) =
+	{noOperation, push, pop, newFrame, jumpToSubroutine,
+	outputChar, halt};
   
     jumptable[programRam[programCounter]]();
     return;
@@ -62,6 +99,27 @@ int main(int argc, char **argv)
 	printf("ERROR: Unable to allocate returnArray!\n");
 	return 1;
     }
+    
+    /*Test Program. Please ignore*/
+    programRam[0] = 1;
+    programRam[1] = 5;
+    programRam[2] = 3;
+    programRam[3] = 1;
+    programRam[4] = 10;
+    programRam[5] = 4;
+    programRam[6] = 1;
+    programRam[7] = 98;
+    programRam[8] = 6;
+    programRam[9] = 0;
+    programRam[10] = 1;
+    programRam[11] = 97;
+    programRam[12] = 5;
+    programRam[13] = 6;
+    programRam[14] = 0;
+    programRam[15] = 0;
+    programRam[16] = 0;
+    programRam[17] = 0;
+    
     
     while(programCounter < 65535){
 	decode();
