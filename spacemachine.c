@@ -89,12 +89,33 @@ void jump(void)
     return;
 }
 
+void duplicate(void)
+{
+    stackArray[stackPointer] = stackArray[stackPointer - 1];
+    stackPointer++;
+}
+
+void ramLoad(void)
+{
+    stackArray[stackPointer - 1] = programRam[stackArray[stackPointer - 1]];
+    return;
+}
+
+void ramStore(void)
+{
+    stackPointer--;
+    programRam[stackArray[stackPointer]] = stackArray[stackPointer -1];
+    stackPointer--;
+    return;
+}
+
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
-    void (*jumptable[9])(void) =
+    void (*jumptable[12])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
-	 outputChar, halt, returnFromFunction, jump};
+	outputChar, halt, returnFromFunction, jump, duplicate,
+	ramLoad, ramStore};
   
     jumptable[programRam[programCounter]]();
     return;
