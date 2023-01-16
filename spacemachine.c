@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <ncurses.h>
 
 #define INT uint16_t
 
@@ -50,6 +51,7 @@ void newFrame(void)
     return;
 }
 
+/* increments the program counter and pushes it to the return stack, then pops the stop of stack and jumps to that adress.*/
 void jumpToSubroutine(void)
 {   
     returnArray[returnPointer] = programCounter + 1;
@@ -59,10 +61,12 @@ void jumpToSubroutine(void)
     return;
 }
 
+/* Pops the top of the stack and sends it to stdout as a character. */
 void outputChar(void)
 {
     stackPointer--;
-    putchar((char)stackArray[stackPointer]);
+    /* putchar((char)stackArray[stackPointer]);*/
+    addch((char)stackArray[stackPointer]);
     programCounter++;
     return;
 }
@@ -72,9 +76,11 @@ void halt(void)
 {
     free(stackArray);
     free(returnArray);
+    endwin();
     exit(0);
 }
 
+/* pops the top of the return stack and moves the program counter to that address. */
 void returnFromFunction(void)
 {
     returnPointer--;
@@ -82,6 +88,7 @@ void returnFromFunction(void)
     return;
 }
 
+/*  Pops the top of the stack and set the program counter to that address. */
 void jump(void)
 {
     stackPointer--;
@@ -89,6 +96,7 @@ void jump(void)
     return;
 }
 
+/* Duplicates the top of the stack. */
 void duplicate(void)
 {
     stackArray[stackPointer] = stackArray[stackPointer - 1];
@@ -96,6 +104,7 @@ void duplicate(void)
     programCounter++;
 }
 
+/* Pops the top of the stack, and puts the value at that adress to the top of the stack. */
 void ramLoad(void)
 {
 
@@ -104,6 +113,7 @@ void ramLoad(void)
     return;
 }
 
+/* Pops the top of the stack and stores the value on the top of the stack at that address.*/
 void ramStore(void)
 {
     stackPointer--;
@@ -113,13 +123,25 @@ void ramStore(void)
     return;
 }
 
+/* get's a charcter from the keyboard and placed it on the top of the stack. Does NOT echo. */
+void getCharacter(void)
+{
+    char character;
+    character = getch();
+    stackArray[stackPointer] = (INT)character;
+    stackPointer++;
+    programCounter++;
+    return;
+}
+
+
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
-    void (*jumptable[12])(void) =
+    void (*jumptable[15])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
 	outputChar, halt, returnFromFunction, jump, duplicate,
-	ramLoad, ramStore};
+	ramLoad, ramStore, getCharacter};
   
     jumptable[programRam[programCounter]]();
     return;
@@ -138,6 +160,13 @@ int main(int argc, char **argv)
 	printf("ERROR: Unable to allocate returnArray!\n");
 	return 1;
     }
+
+    
+    initscr();
+    cbreak();
+    noecho();
+
+
     
     /*Test Program. Please ignore*/
     programRam[0] = 0;
@@ -169,5 +198,6 @@ int main(int argc, char **argv)
   
     free(stackArray);
     free(returnArray);
+    endwin();
     return 0;
 }
