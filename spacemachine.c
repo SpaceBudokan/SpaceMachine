@@ -93,11 +93,14 @@ void duplicate(void)
 {
     stackArray[stackPointer] = stackArray[stackPointer - 1];
     stackPointer++;
+    programCounter++;
 }
 
 void ramLoad(void)
 {
+
     stackArray[stackPointer - 1] = programRam[stackArray[stackPointer - 1]];
+    programCounter++;
     return;
 }
 
@@ -106,6 +109,7 @@ void ramStore(void)
     stackPointer--;
     programRam[stackArray[stackPointer]] = stackArray[stackPointer -1];
     stackPointer--;
+    programCounter++;
     return;
 }
 
