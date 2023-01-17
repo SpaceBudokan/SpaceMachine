@@ -16,6 +16,42 @@ INT stackPointer = 0;
 INT framePointer = 0;
 INT returnPointer = 0;
 
+
+/* Sets up the pointers. */
+void initialize(void)
+{
+        stackArray = malloc(sizeof(INT) * stackSize);
+    if(stackArray == NULL){
+	printf("ERROR: Unable to allocate stackArray!\n");
+	exit(1);
+    }
+
+    returnArray = malloc(sizeof(INT) * returnSize);
+    if(returnArray == NULL){
+	printf("ERROR: Unable to allocate returnArray!\n");
+	free(stackArray);
+	exit(1);
+    }
+
+    /*ncurses setup */
+    initscr();
+    cbreak();
+    noecho();
+    
+    return;
+
+    
+}
+
+/* frees the pointers and stops ncurses */
+void shutdown(void)
+{
+    free(stackArray);
+    free(returnArray);
+    endwin();
+    return;
+}
+    
 /*Does nothing and does it well. */
 void noOperation(void)
 {
@@ -149,25 +185,9 @@ void decode(void)
 
 int main(int argc, char **argv)
 {
-    stackArray = malloc(sizeof(INT) * stackSize);
-    if(stackArray == NULL){
-	printf("ERROR: Unable to allocate stackArray!\n");
-	return 1;
-    }
 
-    returnArray = malloc(sizeof(INT) * returnSize);
-    if(returnArray == NULL){
-	printf("ERROR: Unable to allocate returnArray!\n");
-	return 1;
-    }
-
-    
-    initscr();
-    cbreak();
-    noecho();
-
-
-    
+    initialize();
+   
     /*Test Program. Please ignore*/
     programRam[0] = 0;
     programRam[1] = 0;
@@ -189,15 +209,13 @@ int main(int argc, char **argv)
     programRam[17] = 0;
     programRam[18] = 0;
     programRam[19] = 0;
-    programRam[20] = 0;
+    programRam[20] = 6;
     
     
     while(programCounter < 65535){
 	decode();
     }
   
-    free(stackArray);
-    free(returnArray);
-    endwin();
+    shutdown();
     return 0;
 }
