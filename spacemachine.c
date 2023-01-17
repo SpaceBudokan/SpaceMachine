@@ -20,7 +20,7 @@ INT returnPointer = 0;
 /* Sets up the pointers. */
 void initialize(void)
 {
-        stackArray = malloc(sizeof(INT) * stackSize);
+    stackArray = malloc(sizeof(INT) * stackSize);
     if(stackArray == NULL){
 	printf("ERROR: Unable to allocate stackArray!\n");
 	exit(1);
@@ -77,7 +77,7 @@ void pop(void)
     return;
 }
 
-/* Sets the frame pointer for local variable use. Not required to call a subroutine. */
+/* Sets the frame pointer for local variable use. Not required to call a subroutine. You probably wouldn't even bother with this if you're programming in assembly.*/
 void newFrame(void)
 {
     stackArray[stackPointer] = framePointer;
@@ -184,34 +184,53 @@ void jumpIfFalse(void)
     return;
 }
 
+/* copies the value under the top of the stack to the top of the stack */
+void over(void)
+{
+    stackArray[stackPointer] = stackArray[stackPointer - 2];
+    stackPointer++;
+    programCounter++;
+    return;
+}
+
+
+/* Moves the frame pointer back to it's previous position. Does not pop anything.*/
+void killFrame(void)
+{
+    framePointer = stackArray[framePointer];
+    programCounter++;
+    return;
+}
 
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
-    void (*jumptable[15])(void) =
+    void (*jumptable[20])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
 	outputChar, halt, returnFromFunction, jump, duplicate,
-	ramLoad, ramStore, getCharacter, jumpIfFalse};
+	ramLoad, ramStore, getCharacter, jumpIfFalse, over,
+	killFrame};
   
     jumptable[programRam[programCounter]]();
     return;
 }
 
-int main(int argc, char **argv)
-{
+
+
+int main(int argc, char **argv){
 
     initialize();
    
     /*Test Program. Please ignore*/
-    programRam[0] = 0;
-    programRam[1] = 0;
-    programRam[2] = 0;
-    programRam[3] = 0;
-    programRam[4] = 0;
-    programRam[5] = 0;
-    programRam[6] = 0;
-    programRam[7] = 0;
-    programRam[8] = 0;
+    programRam[0] = 1;
+    programRam[1] = 97;
+    programRam[2] = 3;
+    programRam[3] = 1;
+    programRam[4] = 97;
+    programRam[5] = 3;
+    programRam[6] = 5;
+    programRam[7] = 12;
+    programRam[8] = 6;
     programRam[9] = 0;
     programRam[10] = 0;
     programRam[11] = 0;
