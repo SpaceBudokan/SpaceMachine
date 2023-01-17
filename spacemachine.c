@@ -202,6 +202,28 @@ void killFrame(void)
     return;
 }
 
+/* Get's a value offset relative to the frame pointer (taken from the stack)  and copies it to the top of the stack. */
+void loadLocal(void)
+{
+    INT offset;
+    offset = stackArray[stackPointer -1];
+    stackArray[stackPointer -1] = stackArray[framePointer - offset];
+    programCounter++;
+    return;
+}
+
+/* Stores a value on the stack offset relative to the frame pointer. It's argument is on the top of the stack. The value to store is beneath that. */
+void storeLocal(void)
+{
+    INT offset;
+    INT value;
+    offset = stackArray[stackPointer - 1];
+    value = stackArray[stackPointer - 2];
+    stackArray[framePointer - offset] = value;
+    stackPointer -= 2;
+    programCounter++;
+}
+
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
@@ -209,7 +231,7 @@ void decode(void)
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
 	outputChar, halt, returnFromFunction, jump, duplicate,
 	ramLoad, ramStore, getCharacter, jumpIfFalse, over,
-	killFrame};
+	killFrame, loadLocal, storeLocal};
   
     jumptable[programRam[programCounter]]();
     return;
@@ -222,15 +244,15 @@ int main(int argc, char **argv){
     initialize();
    
     /*Test Program. Please ignore*/
-    programRam[0] = 1;
-    programRam[1] = 97;
-    programRam[2] = 3;
-    programRam[3] = 1;
-    programRam[4] = 97;
-    programRam[5] = 3;
-    programRam[6] = 5;
-    programRam[7] = 12;
-    programRam[8] = 6;
+    programRam[0] = 0;
+    programRam[1] = 0;
+    programRam[2] = 0;
+    programRam[3] = 0;
+    programRam[4] = 0;
+    programRam[5] = 0;
+    programRam[6] = 0;
+    programRam[7] = 0;
+    programRam[8] = 0;
     programRam[9] = 0;
     programRam[10] = 0;
     programRam[11] = 0;
