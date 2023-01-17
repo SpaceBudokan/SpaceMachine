@@ -10,7 +10,7 @@ INT programRam[65536];
 INT *stackArray;
 INT stackSize = 100;
 INT *returnArray;
-INT returnSize = 25;
+INT returnSize = 100;
 INT programCounter = 0;
 INT stackPointer = 0;
 INT framePointer = 0;
@@ -224,6 +224,26 @@ void storeLocal(void)
     programCounter++;
 }
 
+/* Moves the current top of the stack to the return stack */
+void toReturn(void)
+{
+    stackPointer--;
+    returnArray[returnPointer] = stackArray[stackPointer];
+    returnPointer++;
+    programCounter++;
+    return;
+}
+
+/* Moves current top of the return stack to the data stack. */
+void fromReturn(void)
+{  
+    returnPointer--;
+    stackArray[stackPointer] = returnArray[returnPointer];
+    stackPointer++;
+    programCounter++;
+    return;
+}
+
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
@@ -231,7 +251,7 @@ void decode(void)
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
 	outputChar, halt, returnFromFunction, jump, duplicate,
 	ramLoad, ramStore, getCharacter, jumpIfFalse, over,
-	killFrame, loadLocal, storeLocal};
+	killFrame, loadLocal, storeLocal, toReturn, fromReturn};
   
     jumptable[programRam[programCounter]]();
     return;
@@ -244,13 +264,13 @@ int main(int argc, char **argv){
     initialize();
    
     /*Test Program. Please ignore*/
-    programRam[0] = 0;
-    programRam[1] = 0;
-    programRam[2] = 0;
-    programRam[3] = 0;
-    programRam[4] = 0;
-    programRam[5] = 0;
-    programRam[6] = 0;
+    programRam[0] = 1;
+    programRam[1] = 97;
+    programRam[2] = 18;
+    programRam[3] = 19;
+    programRam[4] = 5;
+    programRam[5] = 12;
+    programRam[6] = 6;
     programRam[7] = 0;
     programRam[8] = 0;
     programRam[9] = 0;
