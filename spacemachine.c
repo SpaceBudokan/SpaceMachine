@@ -170,6 +170,20 @@ void getCharacter(void)
     return;
 }
 
+/* jumps to value in next cell if zero, otherwise it skips it */
+void jumpIfFalse(void)
+{
+    stackPointer--;
+    programCounter++;
+    if(stackArray[stackPointer] == 0){
+	programCounter = programRam[programCounter];
+    } else{
+	programCounter++;
+    }
+    
+    return;
+}
+
 
 void decode(void)
 {
@@ -177,7 +191,7 @@ void decode(void)
     void (*jumptable[15])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
 	outputChar, halt, returnFromFunction, jump, duplicate,
-	ramLoad, ramStore, getCharacter};
+	ramLoad, ramStore, getCharacter, jumpIfFalse};
   
     jumptable[programRam[programCounter]]();
     return;
