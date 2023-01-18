@@ -37,10 +37,10 @@ void initialize(void)
     initscr();
     cbreak();
     noecho();
-    
-    return;
-
-    
+    /*nonl();*/ /* Turn off newline when enter is hit.*/
+    intrflush(stdscr, FALSE);
+    keypad(stdscr, TRUE);
+    return;    
 }
 
 /* frees the pointers and stops ncurses */
@@ -244,14 +244,139 @@ void fromReturn(void)
     return;
 }
 
+/* adds the top two elements of the stack */
+void addition(void)
+{
+    stackPointer--;
+    stackArray[stackPointer - 1] = stackArray[stackPointer - 1] + stackArray[stackPointer];
+    programCounter++;
+    return;
+}
+
+/* Subtracts the top of the stack from the next value on the stack. Think of the stack as growing from left to right, and you stick the minus in betwen the top two elements. If the stack is DCBA the subtraction operation does B-A */
+void subtraction(void)
+{
+    stackPointer--;
+    stackArray[stackPointer - 1] = stackArray[stackPointer -1] - stackArray[stackPointer];
+    programCounter++;
+    return;
+}
+
+/* remember there are unsigned integers */
+void multiplication(void)
+{
+    stackPointer--;
+    stackArray[stackPointer - 1] = stackArray[stackPointer -1] * stackArray[stackPointer];
+    programCounter++;
+    return;
+}
+
+/* Like subtraction, if the stack is DCBA, this returns B/A */
+void division(void)
+{
+    stackPointer--;
+    stackArray[stackPointer - 1] = stackArray[stackPointer -1] / stackArray[stackPointer];
+    programCounter++;
+    return;
+}
+
+/* returns B%A */
+void modulus(void)
+{
+    stackPointer--;
+    stackArray[stackPointer - 1] = stackArray[stackPointer -1] % stackArray[stackPointer];
+    programCounter++;
+    return;
+}
+
+/* Zero is false. Nonzero is true. */
+void and(void)
+{
+    stackPointer--;
+    if((stackArray[stackPointer -1] >= 1) && (stackArray[stackPointer] >= 1)){
+	stackArray[stackPointer - 1] = 1;
+    } else {
+	stackArray[stackPointer - 1] = 0;
+    }
+    programCounter++;
+    return;
+}
+
+/* Zero is false. Nonzero is true. */
+void or(void)
+{
+    stackPointer--;
+    if((stackArray[stackPointer -1] >= 1) || (stackArray[stackPointer] >= 1)){
+	stackArray[stackPointer - 1] = 1;
+    } else {
+	stackArray[stackPointer - 1] = 0;
+    }
+    programCounter++;
+    return;
+}
+
+
+/* Zero is false. Nonzero is true. */
+void not(void)
+{
+    stackPointer--;
+    if(stackArray[stackPointer -1] >= 1){
+	stackArray[stackPointer - 1] = 0;
+    } else {
+	stackArray[stackPointer - 1] = 1;
+    }
+    programCounter++;
+    return;
+}
+
+
+void bitwiseAnd(void)
+{
+    stackPointer--;
+    stackArray[stackPointer - 1] = stackArray[stackPointer -1] & stackArray[stackPointer];
+    programCounter++;
+    return;
+}
+
+void bitwiseOr(void)
+{
+    stackPointer--;
+    stackArray[stackPointer - 1] = stackArray[stackPointer -1] | stackArray[stackPointer];
+    programCounter++;
+    return;
+}
+
+void bitwiseXor(void)
+{
+    stackPointer--;
+    stackArray[stackPointer - 1] = stackArray[stackPointer -1] ^ stackArray[stackPointer];
+    programCounter++;
+    return;
+}
+
+void equal(void)
+{
+    stackPointer--;
+    if(stackArray[stackPointer -1] == stackArray[stackPointer]){
+	stackArray[stackPointer - 1] = 1;
+    } else {
+	stackArray[stackPointer - 1] = 0;
+    }
+    programCounter++;
+    return;
+}
+
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
-    void (*jumptable[20])(void) =
+    void (*jumptable[32])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
-	outputChar, halt, returnFromFunction, jump, duplicate,
-	ramLoad, ramStore, getCharacter, jumpIfFalse, over,
-	killFrame, loadLocal, storeLocal, toReturn, fromReturn};
+	 outputChar, halt, returnFromFunction, jump, duplicate,
+	 ramLoad, ramStore, getCharacter, jumpIfFalse, over,
+	 killFrame, loadLocal, storeLocal, toReturn, fromReturn,
+	 addition, subtraction, multiplication, division, modulus,
+	 and, or, not, bitwiseAnd, bitwiseOr,
+	 bitwiseXor, equal};
   
     jumptable[programRam[programCounter]]();
     return;
@@ -265,16 +390,16 @@ int main(int argc, char **argv){
    
     /*Test Program. Please ignore*/
     programRam[0] = 1;
-    programRam[1] = 97;
-    programRam[2] = 18;
-    programRam[3] = 19;
-    programRam[4] = 5;
-    programRam[5] = 12;
-    programRam[6] = 6;
-    programRam[7] = 0;
-    programRam[8] = 0;
-    programRam[9] = 0;
-    programRam[10] = 0;
+    programRam[1] = 99;
+    programRam[2] = 1;
+    programRam[3] = 100;
+    programRam[4] = 31;
+    programRam[5] = 1;
+    programRam[6] = 97;
+    programRam[7] = 20;
+    programRam[8] = 5;
+    programRam[9] = 12;
+    programRam[10] = 6;
     programRam[11] = 0;
     programRam[12] = 0;
     programRam[13] = 0;
