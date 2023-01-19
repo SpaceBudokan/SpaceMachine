@@ -381,7 +381,7 @@ void outputStdout(void)
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
-    void (*jumptable[32])(void) =
+    void (*jumptable[33])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
 	 outputScr, halt, returnFromFunction, jump, duplicate,
 	 ramLoad, ramStore, getCharacter, jumpIfFalse, over,
