@@ -98,7 +98,7 @@ void jumpToSubroutine(void)
 }
 
 /* Pops the top of the stack and sends it to stdscr as a character. */
-void outputScr(void)
+void outputChar(void)
 {
     stackPointer--;
     /* putchar((char)stackArray[stackPointer]);*/
@@ -367,28 +367,17 @@ void equal(void)
 }
 
 
-/* Pops the top of the stack and sends it to stdout as a character. */
-void outputStdout(void)
-{
-    stackPointer--;
-    putchar((char)stackArray[stackPointer]);
-    programCounter++;
-    return;
-}
-
-
-
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
     void (*jumptable[33])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
-	 outputScr, halt, returnFromFunction, jump, duplicate,
+	 outputChar, halt, returnFromFunction, jump, duplicate,
 	 ramLoad, ramStore, getCharacter, jumpIfFalse, over,
 	 killFrame, loadLocal, storeLocal, toReturn, fromReturn,
 	 addition, subtraction, multiplication, division, modulus,
 	 and, or, not, bitwiseAnd, bitwiseOr,
-	 bitwiseXor, equal, outputStdout};
+	 bitwiseXor, equal};
   
     jumptable[programRam[programCounter]]();
     return;
@@ -401,12 +390,12 @@ int main(int argc, char **argv){
     initialize();
    
     /*Test Program. Please ignore*/
-    programRam[0] = 0;
-    programRam[1] = 0;
-    programRam[2] = 0;
+    programRam[0] = 12;
+    programRam[1] = 5;
+    programRam[2] = 1;
     programRam[3] = 0;
-    programRam[4] = 0;
-    programRam[5] = 0;
+    programRam[4] = 8;
+    programRam[5] = 6;
     programRam[6] = 0;
     programRam[7] = 0;
     programRam[8] = 0;
