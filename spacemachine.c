@@ -101,8 +101,16 @@ void jumpToSubroutine(void)
 void outputChar(void)
 {
     stackPointer--;
-    /* putchar((char)stackArray[stackPointer]);*/
-    addch((char)stackArray[stackPointer]);
+    /*putchar(stackArray[stackPointer]);*/
+    if(stackArray[stackPointer] == 8){
+	addch(8);
+	addch(' ');
+	addch(8);
+    }
+    else{
+	addch(stackArray[stackPointer]);
+    }
+    refresh();
     programCounter++;
     return;
 }
@@ -143,7 +151,6 @@ void duplicate(void)
 /* Pops the top of the stack, and puts the value at that adress to the top of the stack. */
 void ramLoad(void)
 {
-
     stackArray[stackPointer - 1] = programRam[stackArray[stackPointer - 1]];
     programCounter++;
     return;
@@ -162,9 +169,12 @@ void ramStore(void)
 /* get's a charcter from the keyboard and placed it on the top of the stack. Does NOT echo. */
 void getCharacter(void)
 {
-    char character;
-    character = getch();
-    stackArray[stackPointer] = (INT)character;
+    int input;
+    input = getch();
+    if(input == KEY_BACKSPACE){
+	input = 8;
+    }
+    stackArray[stackPointer] = input;
     stackPointer++;
     programCounter++;
     return;
