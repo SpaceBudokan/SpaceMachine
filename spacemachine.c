@@ -8,9 +8,9 @@
 
 INT programRam[65536];
 INT *stackArray;
-INT stackSize = 100;
+INT stackSize = 65535;
 INT *returnArray;
-INT returnSize = 100;
+INT returnSize = 65535;
 INT programCounter = 0;
 INT stackPointer = 0;
 INT framePointer = 0;
@@ -380,7 +380,7 @@ void equal(void)
 void decode(void)
 {
     /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
-    void (*jumptable[33])(void) =
+    void (*jumptable[32])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
 	 outputChar, halt, returnFromFunction, jump, duplicate,
 	 ramLoad, ramStore, getCharacter, jumpIfFalse, over,
@@ -400,12 +400,12 @@ int main(int argc, char **argv){
     initialize();
    
     /*Test Program. Please ignore*/
-    programRam[0] = 12;
-    programRam[1] = 5;
-    programRam[2] = 1;
+    programRam[0] = 0;
+    programRam[1] = 0;
+    programRam[2] = 0;
     programRam[3] = 0;
-    programRam[4] = 8;
-    programRam[5] = 6;
+    programRam[4] = 0;
+    programRam[5] = 0;
     programRam[6] = 0;
     programRam[7] = 0;
     programRam[8] = 0;
