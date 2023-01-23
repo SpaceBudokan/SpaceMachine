@@ -1,16 +1,14 @@
-#include <malloc.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <ncurses.h>
 
 #define INT uint16_t
+#define MEMSIZE 65536
 
-INT programRam[65536];
-INT *stackArray;
-INT stackSize = 65535;
-INT *returnArray;
-INT returnSize = 65535;
+INT programRam[MEMSIZE];
+INT stackArray[MEMSIZE];
+INT returnArray[MEMSIZE];
 INT programCounter = 0;
 INT stackPointer = 0;
 INT framePointer = 0;
@@ -20,19 +18,6 @@ INT returnPointer = 0;
 /* Sets up the pointers. */
 void initialize(void)
 {
-    stackArray = malloc(sizeof(INT) * stackSize);
-    if(stackArray == NULL){
-	printf("ERROR: Unable to allocate stackArray!\n");
-	exit(1);
-    }
-
-    returnArray = malloc(sizeof(INT) * returnSize);
-    if(returnArray == NULL){
-	printf("ERROR: Unable to allocate returnArray!\n");
-	free(stackArray);
-	exit(1);
-    }
-
     /*ncurses setup */
     initscr();
     cbreak();
@@ -45,9 +30,7 @@ void initialize(void)
 
 /* frees the pointers and stops ncurses */
 void shutdown(void)
-{
-    free(stackArray);
-    free(returnArray);
+{  
     endwin();
     return;
 }
@@ -118,8 +101,6 @@ void outputChar(void)
 /*Stops the whole thing and exits back to the operating system. */
 void halt(void)
 {
-    free(stackArray);
-    free(returnArray);
     endwin();
     exit(0);
 }
@@ -379,7 +360,7 @@ void equal(void)
 
 void decode(void)
 {
-    /*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
+/*I'm using a jumptable here because I wanted to see if I could make it work. A sane person would use a switch case loop and let the compiler decide. */
     void (*jumptable[32])(void) =
 	{noOperation, push, pop, newFrame, jumpToSubroutine,
 	 outputChar, halt, returnFromFunction, jump, duplicate,
@@ -396,16 +377,31 @@ void decode(void)
 
 
 int main(int argc, char **argv){
-
-    initialize();
-   
+    
+    FILE *filePointer;
+    int readSize;
+    if(argc != 2){
+	puts("Please specify one progarm to run.\n");
+	return 0;
+    }
+    
+    
+    filePointer = fopen(argv[1], "rb");
+    readSize = fread(programRam, sizeof(INT), MEMSIZE, filePointer);
+    fclose(filePointer);
+    if(readSize != MEMSIZE){
+	puts("Error. Not a valid Spacemachine program.\n");
+	return 0;
+    }
+    
     /*Test Program. Please ignore*/
-    programRam[0] = 0;
-    programRam[1] = 0;
-    programRam[2] = 0;
+/*
+    programRam[0] = 12;
+    programRam[1] = 5;
+    programRam[2] = 1;
     programRam[3] = 0;
-    programRam[4] = 0;
-    programRam[5] = 0;
+    programRam[4] = 8;
+    programRam[5] = 6;
     programRam[6] = 0;
     programRam[7] = 0;
     programRam[8] = 0;
@@ -420,13 +416,14 @@ int main(int argc, char **argv){
     programRam[17] = 0;
     programRam[18] = 0;
     programRam[19] = 0;
-    programRam[20] = 6;
-    
-    
-    while(programCounter < 65535){
+    programRam[20] = 0;
+*/    
+
+    initialize();
+    while(programCounter < MEMSIZE){
 	decode();
     }
   
-    shutdown();
+    endwin();
     return 0;
 }
